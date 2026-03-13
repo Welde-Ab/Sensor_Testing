@@ -73,7 +73,8 @@ def read_mcp3002(channel=0):
 try:
     i2c = board.I2C()
     sht = adafruit_sht4x.SHT4x(i2c)
-    sht.mode = adafruit_sht4x.Mode.HIGH_PRECISION_HIGH_HEATER_OFF
+    sht.mode = adafruit_sht4x.Mode.NO_HEATER_HIGHEST_PRECISION
+    # sht.mode = adafruit_sht4x.Mode.HIGH_PRECISION_HIGH_HEATER_OFF
     print("SHT45 detected")
 except Exception as e:
     print("SHT45 init error:", e)
