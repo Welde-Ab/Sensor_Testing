@@ -28,10 +28,13 @@ INFLUX_BUCKET = "figaro_sht45"                    # your bucket
 # Sensor parameters (adjust after calibration)
 VREF = 5.0                # MCP3002 reference voltage
 VC   = 5.0                # Circuit voltage for gas sensors
-RL   = 10000.0            # Trimmer resistance (ohms) - same for both initially
+RL   = 2000.0            # Trimmer resistance (ohms) - same for both initially
 
-RO_2603 = 17000.0         # Baseline Rs for TGS2603 in clean air (UPDATE!)
-RO_2620 = 17000.0         # Baseline Rs for TGS2620 in clean air (UPDATE!)
+# RO_2603 = 17000.0  57700
+# RO_2620 = 17000.0  3400000
+
+RO_2603 = 2000.0         # Baseline Rs for TGS2603 in clean air (UPDATE!)
+RO_2620 = 2000.0         # Baseline Rs for TGS2620 in clean air (UPDATE!)
 
 PPM_EXPONENT = 0.55       # Tune: higher = flatter curve (0.50–0.65 typical)
 
@@ -49,7 +52,7 @@ write_api = client.write_api(write_options=SYNCHRONOUS)
 try:
     spi = spidev.SpiDev()
     spi.open(0, 0)           # bus 0, CE0
-    spi.max_speed_hz = 500000  # 500 kHz - more stable than 1 MHz
+    spi.max_speed_hz = 100000  # 500 kHz - more stable than 1 MHz
 except Exception as e:
     print("SPI error:", e)
     sys.exit(1)
