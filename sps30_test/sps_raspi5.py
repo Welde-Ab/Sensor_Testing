@@ -23,7 +23,9 @@ SAMPLE_INTERVAL_SECONDS = 1
 # -----------------------------
 # InfluxDB settings
 # -----------------------------
-INFLUX_URL = "http://192.168.188.141:8086"
+INFLUX_URL = "https://eu-central-1-1.aws.cloud2.influxdata.com:8086"
+# INFLUX_URL = "http://192.168.188.141:8086"
+# INFLUX_TOKEN = "fLR9lwuVna4BnodWtA05DP8JJbXGA91P3ORSOB0EvoFDDEIrF1XQQ2lbR_BbEgwvcX3nK9laKtzBZ1_xWd0MNg=="
 INFLUX_TOKEN = "fLR9lwuVna4BnodWtA05DP8JJbXGA91P3ORSOB0EvoFDDEIrF1XQQ2lbR_BbEgwvcX3nK9laKtzBZ1_xWd0MNg=="
 INFLUX_ORG = "free-tech"
 INFLUX_BUCKET = "sps30_data"
