@@ -125,7 +125,6 @@ try:
     print("Measuring, writing to InfluxDB, and saving locally... Press Ctrl+C to stop.")
 
     while True:
-        timestamp = time.time()
         now = datetime.now(timezone.utc)
         now_iso = now.isoformat()
         # ── Gas sensors ────────────────────────────────────────
