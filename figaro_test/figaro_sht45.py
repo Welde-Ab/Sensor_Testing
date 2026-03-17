@@ -107,7 +107,7 @@ try:
 
     if file_empty:
     	writer.writerow([
-            "timestamp_utc"
+            "timestamp_utc",
             "adc_2603",
             "adc_2620",
             "voltage_2603",
@@ -118,7 +118,7 @@ try:
             "rs_ro_2620",
             "ppm_2603",
             "ppm_2620",
-	    "Temp (C)",
+            "Temp (C)",
             "Humid (%)"
         ]);
         csv_file.flush();
