@@ -30,9 +30,6 @@ VREF = 5.0                # MCP3002 reference voltage
 VC   = 5.0                # Circuit voltage for gas sensors
 RL   = 2000.0            # Trimmer resistance (ohms) - same for both initially
 
-# RO_2603 = 17000.0  57700
-# RO_2620 = 17000.0  3400000
-
 RO_2603 = 2000.0         # Baseline Rs for TGS2603 in clean air (UPDATE!)
 RO_2620 = 2000.0         # Baseline Rs for TGS2620 in clean air (UPDATE!)
 
@@ -52,7 +49,7 @@ write_api = client.write_api(write_options=SYNCHRONOUS)
 try:
     spi = spidev.SpiDev()
     spi.open(0, 0)           # bus 0, CE0
-    spi.max_speed_hz = 100000  # 500 kHz - more stable than 1 MHz
+    spi.max_speed_hz = 500000  # 500 kHz - more stable than 1 MHz
 except Exception as e:
     print("SPI error:", e)
     sys.exit(1)
@@ -76,9 +73,9 @@ def read_mcp3002(channel=0):
 try:
     i2c = board.I2C()
     sht = adafruit_sht4x.SHT4x(i2c)
-    sht.mode = adafruit_sht4x.Mode.NO_HEATER_HIGHEST_PRECISION
-    # sht.mode = adafruit_sht4x.Mode.HIGH_PRECISION_HIGH_HEATER_OFF
-    print("SHT45 detected")
+    sht.mode = adafruit_sht4x.Mode.NOHEAT_HIGHPRECISION
+    print("SHT45 Serial No.:", hex(sht.serial_number))
+    print("SHT45 running on:", adafruit_sht4x.Mode.string[sht.mode])
 except Exception as e:
     print("SHT45 init error:", e)
     sht = None
@@ -116,8 +113,7 @@ try:
         hum_rh = 0.0
         if sht:
             try:
-                temp_c = sht.temperature
-                hum_rh = sht.relative_humidity
+                temp_c, hum_rh = sht.measurements
             except Exception as e:
                 print("SHT45 read error:", e)
 
@@ -133,7 +129,9 @@ try:
             .field("voltage_2620", voltage_2620) \
             .field("rs_kohm_2620", rs_2620/1000.0) \
             .field("rs_ro_2620", rs_ro_2620) \
-            .field("ppm_2620", ppm_2620)
+            .field("ppm_2620", ppm_2620)\
+	    .field("Temp(C)", temp_c)\
+            .field("Humid(%C)", hum_rh)
 
         p_env = Point("environment") \
             .tag("location", "osaka") \
