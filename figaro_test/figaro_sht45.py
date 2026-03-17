@@ -7,9 +7,13 @@ Unified TGS2603 + TGS2620 + SHT45 Monitor → InfluxDB
 - Logs everything to InfluxDB + prints to terminal
 """
 
-import spidev
+import csv
+import os
 import time
+from datetime import datetime, timezone
 import sys
+
+import spidev
 import board
 import adafruit_sht4x
 from influxdb_client import InfluxDBClient, Point
@@ -36,6 +40,11 @@ RO_2620 = 2000.0         # Baseline Rs for TGS2620 in clean air (UPDATE!)
 PPM_EXPONENT = 0.55       # Tune: higher = flatter curve (0.50–0.65 typical)
 
 READ_INTERVAL = 1.0       # seconds between readings
+
+# -----------------------------
+# Local file settings
+# -----------------------------
+CSV_FILE = "figaro_sht45.csv"
 
 # ────────────────────────────────────────────────
 # InfluxDB Setup
@@ -88,6 +97,33 @@ print(f"Bucket: {INFLUX_BUCKET} | Interval: {READ_INTERVAL}s")
 print("-" * 60)
 
 try:
+
+    # ---- Open local CSV file ----
+    file_exists = os.path.exists(CSV_FILE)
+    file_empty = (not file_exists) or os.path.getsize(CSV_FILE) == 0
+
+    csv_file = open(CSV_FILE, "a", newline="")
+    writer = csv.writer(csv_file)
+
+    if file_empty:
+    	writer.writerow([
+            "timestamp_utc"
+            "adc_2603",
+            "adc_2620",
+            "voltage_2603",
+            "voltage_2620",
+            "rs_kohm_2603",
+            "rs_kohm_2620",
+            "rs_ro_2603",
+            "rs_ro_2620",
+            "ppm_2603",
+            "ppm_2620",
+	    "Temp (C)",
+            "Humid (%)"
+        ]);
+        csv_file.flush();
+    print("Measuring, writing to InfluxDB, and saving locally... Press Ctrl+C to stop.")
+
     while True:
         timestamp = time.time()
 
@@ -139,6 +175,23 @@ try:
             .field("humidity_percent", hum_rh)
 
         write_api.write(bucket=INFLUX_BUCKET, org=INFLUX_ORG, record=[p_gas, p_env])
+	# ---- Save locally to CSV ----
+        writer.writerow([
+            now_iso,
+            adc_2603,
+ 	    adc_2620,
+	    voltage_2603,
+	    voltage_2620,
+            rs_2603,
+            rs_2620,
+	    rs_ro_2603,
+            rs_ro_2620,
+            ppm_2603,
+            ppm_2620,
+            temp_c,
+            hum_rh
+        ])
+        csv_file.flush()
 
         # ── Console output ─────────────────────────────────────
         print(
@@ -160,5 +213,13 @@ except Exception as e:
 
 finally:
     spi.close()
-    client.close()
+    if csv_file is not None:
+        try:
+            csv_file.close()
+        except Exception:
+            pass
+
+    if client is not None:
+        try:
+            client.close()
     print("Clean shutdown.")
