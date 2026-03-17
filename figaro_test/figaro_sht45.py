@@ -106,7 +106,7 @@ try:
     writer = csv.writer(csv_file)
 
     if file_empty:
-    	writer.writerow([
+        writer.writerow([
             "timestamp_utc",
             "adc_2603",
             "adc_2620",
@@ -126,7 +126,8 @@ try:
 
     while True:
         timestamp = time.time()
-
+        now = datetime.now(timezone.utc)
+        now_iso = now.isoformat()
         # ── Gas sensors ────────────────────────────────────────
         adc_2603 = read_mcp3002(0)
         adc_2620 = read_mcp3002(1)
@@ -222,4 +223,6 @@ finally:
     if client is not None:
         try:
             client.close()
+        except Exception:
+            pass
     print("Clean shutdown.")
